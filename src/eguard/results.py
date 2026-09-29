@@ -336,3 +336,11 @@ class Report(_Frozen):
     @classmethod
     def from_json(cls, path: str | Path) -> Report:
         return cls.model_validate_json(Path(path).read_text(encoding="utf-8"))
+
+    def to_html(self, path: str | Path) -> None:
+        """Save the report as a self-contained HTML page, creating folders as needed."""
+        from eguard.reporting import render_html  # avoids a circular import
+
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(render_html(self), encoding="utf-8")

@@ -80,3 +80,8 @@ def warn_small_groups(
             EguardWarning,
             stacklevel=3,
         )
+
+
+def warn_unstable(message: str) -> None:
+    """Warn that a result is statistically unstable. Call directly from a metric function."""
+    warnings.warn(message, EguardWarning, stacklevel=3)

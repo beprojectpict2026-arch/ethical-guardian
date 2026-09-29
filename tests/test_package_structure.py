@@ -22,6 +22,10 @@ MODULES = [
     "eguard.scenarios",
     "eguard.scenarios.hiring",
     "eguard.scenarios.hiring.generator",
+    "eguard.metrics.proxy",
+    "eguard.checks",
+    "eguard.checks.data",
+    "eguard.checks.thresholds",
 ]
 
 

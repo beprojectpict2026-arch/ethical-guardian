@@ -207,6 +207,71 @@ TPR gap $= 0.3$, FPR gap $= 0.1$, so $\text{EOD} = 0.3$ → flagged.
 
 ---
 
+## 3a. Representation ratio
+
+**Dimension:** Equity. **Module:** `eguard.checks.data` (data phase)
+
+**Purpose.** Flags protected groups that are much smaller than others, since results for
+small groups are unreliable.
+
+**Formula.** With $q_g$ the share of rows in group $g$:
+
+$$
+\text{representation ratio} = \frac{\min_g q_g}{\max_g q_g}
+$$
+
+**Output range.** $(0, 1]$. `1` = equal group sizes. **Bad direction:** lower.
+
+**Thresholds (provisional).** Warn below 0.5, fail below 0.25.
+
+**Risk.** None. Imbalance limits reliability but is not a harm in itself, so this check
+does not contribute to the composite score.
+
+---
+
+## 3b. Proxy strength
+
+**Dimension:** Equity. **Module:** `eguard.metrics.proxy`
+
+**Purpose.** Measures how well a non-protected column (e.g. postcode) can stand in for a
+protected attribute. A strong proxy lets a model reproduce group differences even after the
+protected attribute is removed.
+
+**Formula.** Group rows by the feature's value. Let *accuracy* be the share of rows whose
+attribute equals the most common attribute within their feature group, and *baseline* the
+share of the most common attribute overall:
+
+$$
+\text{proxy strength} = \frac{\text{accuracy} - \text{baseline}}{1 - \text{baseline}}
+$$
+
+Numeric features with more than 10 distinct values are first split into 10 equal-count bins.
+Missing values form their own category.
+
+**Output range.** $[0, 1]$. `0` = no predictive power, `1` = the feature determines the
+attribute. **Bad direction:** higher.
+
+**Thresholds (provisional).** Warn above 0.3; fail above 0.9, where the column is effectively
+a copy of the protected attribute.
+
+**Risk (data phase).** $\text{proxy strength} \times (1 - \text{DPR of the label})$ for the
+same attribute. A proxy only creates risk to the extent there is disparity for a model to
+learn. If label parity is undefined, the label disparity is taken as 1 (conservative).
+
+**Edge cases.** Empty input, fewer than 2 attribute groups, mismatched lengths or
+`bins < 2` → `ValueError`. Fewer than 20 rows per feature level → computed normally with an
+`EguardWarning`, since the score is then inflated by chance.
+
+**Hand-computed test cases.**
+
+| Feature | Attribute | Expected |
+|---|---|---|
+| `a, a, b, b` | `x, x, y, y` | `1.0` |
+| `a, b, a, b` | `x, x, y, y` | `0.0` |
+| `a, a, a, b` | `x, x, y, y` | `0.5` (accuracy 0.75, baseline 0.5) |
+
+---
+
 ## 4. Job displacement score (JDS)
 
 **Dimension:** Labour impact. **Module:** `eguard.metrics.labour`
@@ -418,3 +483,4 @@ dimensions: equity and labour.
 | Version | Change |
 |---|---|
 | v1 | Initial definitions for Gini, Gini delta, DPR, EOD, JDS, CV; composite score scheme; explainability index deferred. |
+| v1.1 | Added representation ratio (3a) and proxy strength (3b) for the data-phase check. |

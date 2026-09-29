@@ -2,6 +2,7 @@
 
 from importlib.metadata import PackageNotFoundError, version
 
+from eguard.checks import check
 from eguard.config import GuardConfig
 from eguard.exceptions import EguardWarning, EvaluationFailed, ManifestError
 from eguard.manifest import AgentProfile
@@ -23,5 +24,6 @@ __all__ = [
     "Report",
     "Status",
     "Threshold",
+    "check",
     "__version__",
 ]

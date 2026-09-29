@@ -19,6 +19,9 @@ MODULES = [
     "eguard.manifest",
     "eguard.manifest.schema",
     "eguard.config",
+    "eguard.scenarios",
+    "eguard.scenarios.hiring",
+    "eguard.scenarios.hiring.generator",
 ]
 
 

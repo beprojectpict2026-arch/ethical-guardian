@@ -19,6 +19,9 @@ dev = [
     "ruff>=0.6",
     "pre-commit>=3.7",
 ]
+examples = [
+    "scikit-learn>=1.4",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -45,3 +48,7 @@ select = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q --strict-markers"
+pythonpath = ["."]
+
+[tool.uv]
+default-groups = ["dev", "examples"]

@@ -28,6 +28,7 @@ MODULES = [
     "eguard.checks.thresholds",
     "eguard.agents",
     "eguard.agents.screening",
+    "eguard.scenarios.hiring.reference",
 ]
 
 

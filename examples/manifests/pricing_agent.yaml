@@ -1,0 +1,27 @@
+# Agent manifest: filled in by the team building the agent, at the planning phase.
+# Field reference: src/eguard/manifest/schema.py
+schema_version: 1
+name: Dynamic Pricing Engine
+version: "0.1.0"
+description: >
+  Sets daily prices for products in an online marketplace based on demand
+  and competitor prices.
+owner: Marketplace Pricing Team
+agent_type: pricing
+
+decisions:
+  - set product prices
+affected_groups:
+  - customers
+  - competing sellers
+protected_attributes:
+  - customer_income_band
+
+ai_model:
+  provider: in-house
+  name: q-learning-pricer
+  hosting: self_hosted
+
+deployment:
+  decisions_per_day: 50000
+  regions: [IN]

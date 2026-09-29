@@ -11,6 +11,7 @@ from eguard.scenarios.hiring.generator import (
     generate_candidates,
     historical_records,
 )
+from eguard.scenarios.hiring.reference import SkillBasedScreener, shortlist_top
 
 __all__ = [
     "EDUCATION_LEVELS",
@@ -18,8 +19,10 @@ __all__ = [
     "HIDDEN_COLUMNS",
     "LABEL_COLUMN",
     "PROTECTED_COLUMNS",
+    "SkillBasedScreener",
     "CandidatePoolConfig",
     "applicant_view",
     "generate_candidates",
     "historical_records",
+    "shortlist_top",
 ]

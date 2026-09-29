@@ -11,3 +11,7 @@ class ManifestError(ValueError):
 
 class EvaluationFailed(AssertionError):
     """A report contains failing or undefined checks. Raised by Report.raise_for_status()."""
+
+
+class AgentError(ValueError):
+    """An agent crashed or returned output that breaks its interface contract."""

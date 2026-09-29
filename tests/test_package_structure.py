@@ -18,6 +18,7 @@ MODULES = [
     "eguard.metrics.market",
     "eguard.manifest",
     "eguard.manifest.schema",
+    "eguard.config",
 ]
 
 

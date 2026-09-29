@@ -30,6 +30,7 @@ MODULES = [
     "eguard.agents.screening",
     "eguard.scenarios.hiring.reference",
     "eguard.checks.testing",
+    "eguard.reporting",
 ]
 
 
@@ -48,3 +49,8 @@ def test_package_ships_type_marker():
 
 def test_eguard_warning_is_exported_user_warning():
     assert issubclass(eguard.EguardWarning, UserWarning)
+
+
+def test_package_ships_report_template():
+    template = resources.files("eguard.reporting").joinpath("templates/report.html.j2")
+    assert template.is_file()

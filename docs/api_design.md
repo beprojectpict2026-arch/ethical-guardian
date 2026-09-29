@@ -157,6 +157,7 @@ def check(
     *,
     data: pd.DataFrame | None = None,  # phase "data"
     target: str | None = None,  # label column in `data`
+    exclude: Sequence[str] = (),  # columns never tested as proxies
     prompt: str | None = None,  # phase "design"
     objective: str | None = None,  # phase "design"
     reports: list[Report] | None = None,  # phase "deployment"

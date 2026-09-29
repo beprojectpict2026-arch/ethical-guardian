@@ -7,11 +7,12 @@ from collections.abc import Sequence
 import pandas as pd
 
 from eguard.checks.data import check_data
+from eguard.checks.testing import evaluate
 from eguard.config import GuardConfig
 from eguard.manifest import AgentProfile
 from eguard.results import Phase, Report
 
-__all__ = ["check", "check_data"]
+__all__ = ["check", "check_data", "evaluate"]
 
 
 def check(

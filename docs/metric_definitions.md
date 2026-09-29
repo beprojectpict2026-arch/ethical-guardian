@@ -1,8 +1,8 @@
 # Metric Definitions
 
-**Status:** v1 (Stage 1). This document is the single source of truth for every metric in
-`eguard.metrics`. Code, tests and the paper must match it. Any change to a formula or
-threshold is made here first, in a reviewed pull request.
+**Status:** v1.2 (Stage 2). This document is the single source of truth for every metric in
+`eguard.metrics` and every check built on them. Code, tests and the paper must match it. Any
+change to a formula or threshold is made here first, in a reviewed pull request.
 
 ---
 
@@ -272,6 +272,46 @@ learn. If label parity is undefined, the label disparity is taken as 1 (conserva
 
 ---
 
+## 3c. Counterfactual flip rate
+
+**Dimension:** Equity. **Module:** `eguard.checks.testing` (development, training and
+testing phases)
+
+**Purpose.** Tests whether an agent uses a protected attribute *directly*: if only that
+attribute changes and every other input stays the same, decisions should not change.
+
+**Formula.** Each applicant is moved to the next group of the attribute (with two groups,
+the groups are swapped), all other inputs are left unchanged, and the agent decides again:
+
+$$
+\text{flip rate} = \frac{\#\{\text{applicants whose decision changes}\}}{\#\{\text{applicants}\}}
+$$
+
+All applicants are changed at once, so rank-based agents that shortlist a fixed share are
+evaluated consistently.
+
+**Output range.** $[0, 1]$. `0` = the attribute has no direct effect. **Bad direction:** higher.
+
+**Thresholds (provisional).** Warn above 0.01, fail above 0.05.
+
+**Risk.** None. The flip rate diagnoses *how* a disparity arises; the harm itself is measured
+by demographic parity and equalized odds. Read together: parity fails and the flip rate is
+high → the agent uses the attribute directly; parity fails and the flip rate is near zero →
+the disparity comes through a proxy.
+
+**Testing-phase thresholds for sections 2 and 3.** In the testing phase, demographic parity of
+the agent's decisions uses warn below 0.9, fail below 0.8; equalized odds difference against
+true qualification uses warn above 0.05, fail above 0.1.
+
+Metrics are computed on the decisions pooled across all seeds, because ratios such as DPR are
+biased downward on small samples: the minimum of several noisy group rates is systematically
+low, so even a fair agent scores below 1 on small pools. Per-seed values are kept as evidence.
+A parity warning or failure is attributed to the agent only if its DPR is at least 0.1 below
+the reference agent's on the same applicants; otherwise the report attributes it to the
+applicant pool.
+
+---
+
 ## 4. Job displacement score (JDS)
 
 **Dimension:** Labour impact. **Module:** `eguard.metrics.labour`
@@ -397,8 +437,7 @@ not applicable in the composite score.
 
 ## 7. Composite ethical–economic risk score
 
-**Module:** implemented with the check layer (Stage 2 onward); defined here so every metric
-above is designed to feed into it.
+**Module:** `eguard.results.Report` and `eguard.config.GuardConfig`.
 
 ### 7.1 Dimension weights (provisional)
 
@@ -425,6 +464,8 @@ Each metric is converted to a risk value $r \in [0, 1]$:
 | Gini delta | $\min\big(\max(\Delta G, 0) / \Delta G_{\text{ref}},\, 1\big)$, with $\Delta G_{\text{ref}} = 0.10$ (provisional) |
 | JDS | $\text{JDS} / 100$ |
 | CV | $\min\big(\max(\text{CV}_{\text{agent}} - \text{CV}_{\text{baseline}}, 0) / \text{CV}_{\text{ref}},\, 1\big)$, with $\text{CV}_{\text{ref}} = 20$ percentage points (provisional) |
+| Proxy strength (data phase) | $\text{proxy strength} \times (1 - \text{DPR of the label})$ |
+| Representation ratio, counterfactual flip rate | none (diagnostic only) |
 
 A dimension's risk $r_d$ is the **maximum** of its available metric risks. A risk tool
 should not let one good metric hide a bad one.
@@ -484,3 +525,4 @@ dimensions: equity and labour.
 |---|---|
 | v1 | Initial definitions for Gini, Gini delta, DPR, EOD, JDS, CV; composite score scheme; explainability index deferred. |
 | v1.1 | Added representation ratio (3a) and proxy strength (3b) for the data-phase check. |
+| v1.2 | Added counterfactual flip rate (3c), testing-phase thresholds, pooling across seeds and attribution to the reference agent. Updated the risk mapping table (7.2) for the new metrics. |

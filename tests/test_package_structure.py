@@ -29,6 +29,7 @@ MODULES = [
     "eguard.agents",
     "eguard.agents.screening",
     "eguard.scenarios.hiring.reference",
+    "eguard.checks.testing",
 ]
 
 

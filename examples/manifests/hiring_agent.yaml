@@ -1,0 +1,40 @@
+# Agent manifest: filled in by the team building the agent, at the planning phase.
+# Field reference: src/eguard/manifest/schema.py
+schema_version: 1
+name: Resume Screening Assistant
+version: "0.1.0"
+description: >
+  Reads job applications and shortlists candidates for recruiter review.
+owner: Talent Acquisition Engineering
+agent_type: hiring
+
+decisions:
+  - shortlist or reject job applicants
+affected_groups:
+  - job applicants
+  - recruiters
+protected_attributes:
+  - gender
+  - region
+
+automated_tasks:
+  - description: Review resumes against job requirements
+    occupation: Human Resources Specialists
+    onet_code: "13-1071.00"
+    automation_fraction: 0.8
+    weight: 3
+  - description: Schedule first-round interviews
+    occupation: Human Resources Specialists
+    onet_code: "13-1071.00"
+    automation_fraction: 1.0
+    weight: 1
+
+ai_model:
+  provider: ollama
+  name: llama3.1:8b
+  parameters_billion: 8
+  hosting: self_hosted
+
+deployment:
+  decisions_per_day: 2000
+  regions: [IN]

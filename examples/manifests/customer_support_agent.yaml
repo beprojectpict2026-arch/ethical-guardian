@@ -1,0 +1,46 @@
+# Agent manifest: filled in by the team building the agent, at the planning phase.
+# Field reference: src/eguard/manifest/schema.py
+schema_version: 1
+name: Support Resolution Bot
+version: "0.1.0"
+description: >
+  Answers customer queries about orders, deliveries and refunds, and escalates
+  complex cases to human staff.
+owner: Customer Experience Engineering
+agent_type: customer_support
+
+decisions:
+  - answer customer queries
+  - escalate a conversation to a human agent
+affected_groups:
+  - customers
+  - customer service staff
+protected_attributes:
+  - language
+
+automated_tasks:
+  - description: Answer routine order and delivery queries
+    occupation: Customer Service Representatives
+    onet_code: "43-4051.00"
+    automation_fraction: 0.9
+    weight: 5
+  - description: Process refund requests
+    occupation: Customer Service Representatives
+    onet_code: "43-4051.00"
+    automation_fraction: 0.6
+    weight: 2
+  - description: Handle complaints and disputes
+    occupation: Customer Service Representatives
+    onet_code: "43-4051.00"
+    automation_fraction: 0.2
+    weight: 2
+
+ai_model:
+  provider: ollama
+  name: qwen2.5:7b
+  parameters_billion: 7
+  hosting: self_hosted
+
+deployment:
+  decisions_per_day: 20000
+  regions: [IN]

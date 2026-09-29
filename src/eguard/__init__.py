@@ -4,7 +4,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 from eguard.checks import check
 from eguard.config import GuardConfig
-from eguard.exceptions import EguardWarning, EvaluationFailed, ManifestError
+from eguard.exceptions import AgentError, EguardWarning, EvaluationFailed, ManifestError
 from eguard.manifest import AgentProfile
 from eguard.results import CheckResult, Phase, Report, Status, Threshold
 
@@ -14,6 +14,7 @@ except PackageNotFoundError:  # package not installed, e.g. running from a raw c
     __version__ = "0.0.0"
 
 __all__ = [
+    "AgentError",
     "AgentProfile",
     "CheckResult",
     "EguardWarning",

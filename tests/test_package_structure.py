@@ -26,6 +26,8 @@ MODULES = [
     "eguard.checks",
     "eguard.checks.data",
     "eguard.checks.thresholds",
+    "eguard.agents",
+    "eguard.agents.screening",
 ]
 
 

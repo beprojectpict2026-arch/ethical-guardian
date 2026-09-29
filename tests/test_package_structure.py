@@ -8,8 +8,10 @@ import pytest
 import eguard
 
 MODULES = [
+    "eguard.exceptions",
     "eguard.results",
     "eguard.metrics",
+    "eguard.metrics._validation",
     "eguard.metrics.inequality",
     "eguard.metrics.fairness",
     "eguard.metrics.labour",
@@ -30,3 +32,7 @@ def test_version_is_set():
 
 def test_package_ships_type_marker():
     assert resources.files("eguard").joinpath("py.typed").is_file()
+
+
+def test_eguard_warning_is_exported_user_warning():
+    assert issubclass(eguard.EguardWarning, UserWarning)

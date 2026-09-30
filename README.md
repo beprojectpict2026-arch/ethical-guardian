@@ -22,6 +22,14 @@ problem (a postcode proxy for region), the evaluation confirming it in the train
 the suggested fix removing it. Options: `--quick`, `--bias 0.5`, and `--llm` (requires
 Ollama).
 
+For the full lifecycle, where seven projects with different flaws go through planning, data,
+design, testing and the deployment gate, and each flaw is caught at a different phase:
+
+```bash
+uv run python -m examples.lifecycle_demo
+open reports/lifecycle/index.html
+```
+
 ## Command line
 
 ```bash

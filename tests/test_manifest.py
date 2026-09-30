@@ -146,6 +146,10 @@ def test_missing_required_field_is_reported():
         ({"automated_tasks": [{"description": "x", "onet_code": "43-4051"}]}, "onet_code"),
         ({"ai_model": {"provider": "x", "name": "y", "hosting": "cloud"}}, "hosting"),
         ({"deployment": {"decisions_per_day": -1}}, "decisions_per_day"),
+        (
+            {"automated_tasks": [{"description": "x", "reskilling_feasibility": 1.5}]},
+            "reskilling_feasibility",
+        ),
     ],
 )
 def test_invalid_fields_are_rejected_with_field_name(overrides, field):

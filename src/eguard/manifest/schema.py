@@ -89,6 +89,12 @@ class AutomatedTask(_StrictModel):
     weight: float = Field(
         default=1.0, gt=0.0, description="Importance or time share of the task (u_t)."
     )
+    reskilling_feasibility: float | None = Field(
+        default=None,
+        ge=0.0,
+        le=1.0,
+        description="How easily workers in this occupation can move to other roles (R).",
+    )
 
 
 class ModelInfo(_StrictModel):

@@ -1,6 +1,6 @@
 # Metric Definitions
 
-**Status:** v1.2 (Stage 2). This document is the single source of truth for every metric in
+**Status:** v1.3 (Stage 4). This document is the single source of truth for every metric in
 `eguard.metrics` and every check built on them. Code, tests and the paper must match it. Any
 change to a formula or threshold is made here first, in a reviewed pull request.
 
@@ -367,6 +367,18 @@ in how much of a job they represent. If weights are omitted, all $u_t = 1$.
 | `[1, 0]` | `[3, 1]` | 0.0 | `100 × 0.75 × 1 = 75.0` |
 | `[0.5, 0.5]` | none | 1.0 | `0.0` (fully reskillable) |
 
+**Planning-phase use.** The planning check computes JDS from the manifest's
+`automated_tasks`, separately for each affected occupation (tasks are grouped by their
+`occupation` field; tasks without one form an "unspecified occupation" group). Each
+occupation uses the reskilling feasibility declared on its tasks; if several tasks of one
+occupation declare different values, the lowest (most conservative) is used. If none is
+declared, $R = 0$ is assumed and the result is reported as an **upper bound**. The check
+reports the most affected occupation (the maximum JDS), with every occupation's score as
+evidence. An agent that declares no automated tasks has JDS 0.
+
+**Thresholds (provisional).** Warn above 20, fail above 50 (the interpretation bands above).
+Risk = JDS / 100.
+
 **Limitation (to state in the paper).** JDS measures *exposure* of work to automation by
 this agent. It does not predict actual job losses, which also depend on demand, company
 decisions and policy.
@@ -435,6 +447,34 @@ not applicable in the composite score.
 
 ---
 
+## 6a. Documentation completeness
+
+**Dimension:** Transparency. **Module:** `eguard.checks.planning` (planning phase)
+
+**Purpose.** Checks that the agent manifest contains the information later checks and
+audits rely on, in the spirit of technical-documentation requirements such as those of the
+EU AI Act.
+
+**Formula.** The share of applicable documentation items that are present:
+
+$$
+\text{completeness} = \frac{\#\{\text{items present}\}}{\#\{\text{applicable items}\}}
+$$
+
+Items always checked: owner, AI model, deployment scale. Added when the relevant dimension
+applies: protected attributes (equity); for automated tasks, an occupation, an O*NET code
+and a reskilling feasibility on every task (labour); the model's parameter count
+(sustainability).
+
+**Output range.** $[0, 1]$. **Bad direction:** lower.
+
+**Thresholds (provisional).** Warn below 1.0 (anything missing), fail below 0.5.
+
+**Risk.** None (diagnostic). Missing documentation limits what can be evaluated; it is not
+a harm in itself.
+
+---
+
 ## 7. Composite ethical–economic risk score
 
 **Module:** `eguard.results.Report` and `eguard.config.GuardConfig`.
@@ -465,7 +505,7 @@ Each metric is converted to a risk value $r \in [0, 1]$:
 | JDS | $\text{JDS} / 100$ |
 | CV | $\min\big(\max(\text{CV}_{\text{agent}} - \text{CV}_{\text{baseline}}, 0) / \text{CV}_{\text{ref}},\, 1\big)$, with $\text{CV}_{\text{ref}} = 20$ percentage points (provisional) |
 | Proxy strength (data phase) | $\text{proxy strength} \times (1 - \text{DPR of the label})$ |
-| Representation ratio, counterfactual flip rate | none (diagnostic only) |
+| Representation ratio, counterfactual flip rate, documentation completeness | none (diagnostic only) |
 
 A dimension's risk $r_d$ is the **maximum** of its available metric risks. A risk tool
 should not let one good metric hide a bad one.
@@ -526,3 +566,4 @@ dimensions: equity and labour.
 | v1 | Initial definitions for Gini, Gini delta, DPR, EOD, JDS, CV; composite score scheme; explainability index deferred. |
 | v1.1 | Added representation ratio (3a) and proxy strength (3b) for the data-phase check. |
 | v1.2 | Added counterfactual flip rate (3c), testing-phase thresholds, pooling across seeds and attribution to the reference agent. Updated the risk mapping table (7.2) for the new metrics. |
+| v1.3 | Planning-phase use of JDS (per occupation, conservative reskilling assumption, thresholds) and documentation completeness (6a). |

@@ -130,7 +130,7 @@
         <td class="num">{{ "%.2f" | format(report.config.weights[dimension]) }}</td>
         <td class="num">
           {% if risk is none %}
-          <span class="meta">not evaluated in this phase</span>
+          <span class="meta">not scored in this phase</span>
           {% else %}
           {{ "%.2f" | format(risk) }}
           <div class="bar"><span style="width: {{ (risk * 100) | round(1) }}%; background: var(--{{ tier_of(risk) }});"></span></div>

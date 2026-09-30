@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 
-from eguard.checks.thresholds import DEFAULT_THRESHOLDS
+from eguard.checks.thresholds import get_threshold, with_config
 from eguard.config import GuardConfig
 from eguard.manifest import AgentProfile, AgentType, AutomatedTask, Dimension
 from eguard.metrics import job_displacement_score
@@ -38,6 +38,7 @@ REGULATORY_NOTES = {
 DISCLAIMER = "Indicative classification only; not legal advice."
 
 
+@with_config
 def check_planning(profile: AgentProfile, *, config: GuardConfig | None = None) -> Report:
     """Run planning-phase checks using only the agent manifest."""
     results: list[CheckResult] = []
@@ -55,7 +56,7 @@ def check_planning(profile: AgentProfile, *, config: GuardConfig | None = None) 
 
 
 def _job_displacement(tasks: list[AutomatedTask]) -> CheckResult:
-    threshold = DEFAULT_THRESHOLDS["job_displacement"]
+    threshold = get_threshold("job_displacement")
     check_id = "labour.job_displacement"
     if not tasks:
         return CheckResult.from_value(
@@ -152,7 +153,7 @@ def _documentation(profile: AgentProfile) -> CheckResult:
         Dimension.TRANSPARENCY,
         PHASE,
         completeness,
-        DEFAULT_THRESHOLDS["documentation"],
+        get_threshold("documentation"),
         risk=None,
         message=message,
         evidence={"items": items},

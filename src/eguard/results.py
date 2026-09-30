@@ -1,5 +1,6 @@
-"""Result objects shared by every check: Phase, Status, Threshold, CheckResult and Report.
+"""Result objects shared by every check: Phase, CheckResult and Report.
 
+Status, RiskTier and Threshold live in eguard.scoring and are re-exported here.
 Design: docs/api_design.md section 4. Composite scoring: docs/metric_definitions.md section 7.
 """
 
@@ -17,6 +18,17 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from eguard.config import GuardConfig
 from eguard.exceptions import EvaluationFailed
 from eguard.manifest import AgentProfile, Dimension
+from eguard.scoring import RiskTier, Status, Threshold
+
+__all__ = [
+    "CheckResult",
+    "Phase",
+    "Report",
+    "ReportMetadata",
+    "RiskTier",
+    "Status",
+    "Threshold",
+]
 
 
 class Phase(StrEnum):
@@ -32,71 +44,11 @@ class Phase(StrEnum):
     MONITORING = "monitoring"
 
 
-class Status(StrEnum):
-    """Outcome of one check. UNDEFINED never counts as a pass."""
-
-    PASS = "pass"
-    WARN = "warn"
-    FAIL = "fail"
-    UNDEFINED = "undefined"
-    NOT_APPLICABLE = "not_applicable"
-
-
-class RiskTier(StrEnum):
-    """Band of the composite risk score."""
-
-    LOW = "low"
-    MODERATE = "moderate"
-    HIGH = "high"
-    CRITICAL = "critical"
-
-
 _BLOCKING = frozenset({Status.FAIL, Status.UNDEFINED})
 
 
 class _Frozen(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-
-
-class Threshold(_Frozen):
-    """Warning and failure boundaries for one metric.
-
-    A value strictly past a boundary triggers it; a value exactly on a boundary does not.
-    This matches the definitions: DPR below 0.8 fails, DPR of exactly 0.8 does not.
-    """
-
-    warn_at: float = Field(allow_inf_nan=False)
-    fail_at: float = Field(allow_inf_nan=False)
-    direction: Literal["higher_is_worse", "lower_is_worse"]
-
-    @model_validator(mode="after")
-    def _check_order(self) -> Self:
-        if self.direction == "higher_is_worse" and self.warn_at > self.fail_at:
-            raise ValueError("for higher_is_worse, warn_at must not exceed fail_at")
-        if self.direction == "lower_is_worse" and self.warn_at < self.fail_at:
-            raise ValueError("for lower_is_worse, warn_at must not be below fail_at")
-        return self
-
-    def evaluate(self, value: float | None) -> Status:
-        """Status for a metric value. None or NaN gives UNDEFINED."""
-        if value is None or math.isnan(value):
-            return Status.UNDEFINED
-        if self.direction == "higher_is_worse":
-            if value > self.fail_at:
-                return Status.FAIL
-            if value > self.warn_at:
-                return Status.WARN
-            return Status.PASS
-        if value < self.fail_at:
-            return Status.FAIL
-        if value < self.warn_at:
-            return Status.WARN
-        return Status.PASS
-
-    def describe(self) -> str:
-        """Plain-language description, e.g. 'warn below 0.9, fail below 0.8'."""
-        word = "above" if self.direction == "higher_is_worse" else "below"
-        return f"warn {word} {self.warn_at:g}, fail {word} {self.fail_at:g}"
 
 
 class CheckResult(_Frozen):
@@ -257,7 +209,7 @@ class Report(_Frozen):
 
     @property
     def unevaluated_dimensions(self) -> list[Dimension]:
-        """Applicable dimensions with no measured risk in this report."""
+        """Applicable dimensions with no risk-scored result in this report."""
         return [dim for dim, risk in self.dimension_risks.items() if risk is None]
 
     @property
@@ -325,7 +277,7 @@ class Report(_Frozen):
             lines.append(f"  [{r.status.value.upper()}] {r.check_id} = {value}: {r.message}")
         if self.unevaluated_dimensions:
             names = ", ".join(dim.value for dim in self.unevaluated_dimensions)
-            lines.append(f"Not evaluated in this phase: {names}")
+            lines.append(f"Not scored in this phase: {names}")
         return "\n".join(lines)
 
     # ------------------------------------------------------------------------ saving

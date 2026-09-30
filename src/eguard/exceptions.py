@@ -15,3 +15,7 @@ class EvaluationFailed(AssertionError):
 
 class AgentError(ValueError):
     """An agent crashed or returned output that breaks its interface contract."""
+
+
+class ConfigError(ValueError):
+    """A configuration file could not be read or is invalid."""

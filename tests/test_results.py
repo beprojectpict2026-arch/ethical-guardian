@@ -320,4 +320,4 @@ def test_summary_content():
     assert "Composite risk: 0.38 (moderate)" in summary
     assert "Results: 1 pass, 1 warn, 2 fail, 0 undefined, 0 not_applicable" in summary
     assert "[FAIL] equity.demographic_parity_ratio = 0.600" in summary
-    assert "Not evaluated in this phase: sustainability, transparency" in summary
+    assert "Not scored in this phase: sustainability, transparency" in summary

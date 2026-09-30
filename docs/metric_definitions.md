@@ -1,6 +1,6 @@
 # Metric Definitions
 
-**Status:** v1.4 (Stage 4). This document is the single source of truth for every metric in
+**Status:** v1.5 (Stage 4). This document is the single source of truth for every metric in
 `eguard.metrics` and every check built on them. Code, tests and the paper must match it. Any
 change to a formula or threshold is made here first, in a reviewed pull request.
 
@@ -28,8 +28,8 @@ every undefined value visible.
 **Small groups.** Group-based metrics emit an `EguardWarning` when any group has fewer than
 30 members, because rates on small groups are unstable.
 
-**Thresholds.** Thresholds marked *provisional* are starting values. They are configurable
-and will be examined in the sensitivity analysis before being reported in the paper.
+**Thresholds.** Thresholds marked *provisional* are starting values. They can be overridden per
+project in a `GuardConfig` YAML file (see `examples/guard_config.yaml`) and will be examined in the sensitivity analysis before being reported in the paper.
 
 ---
 
@@ -597,3 +597,4 @@ dimensions: equity and labour.
 | v1.2 | Added counterfactual flip rate (3c), testing-phase thresholds, pooling across seeds and attribution to the reference agent. Updated the risk mapping table (7.2) for the new metrics. |
 | v1.3 | Planning-phase use of JDS (per occupation, conservative reskilling assumption, thresholds) and documentation completeness (6a). |
 | v1.4 | Design instruction scan (6b). |
+| v1.5 | All thresholds, weights and tier boundaries configurable via `GuardConfig`. |

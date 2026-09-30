@@ -1,0 +1,10 @@
+# Ethical Guardian Suite configuration: a stricter policy than the defaults.
+# Every key is optional; anything omitted keeps its documented default
+# (docs/metric_definitions.md). Threshold directions cannot be changed.
+weights:
+  equity: 0.35
+thresholds:
+  job_displacement: {warn_at: 10, fail_at: 30}
+  label_parity: {warn_at: 0.95, fail_at: 0.9}
+  demographic_parity: {warn_at: 0.95, fail_at: 0.9}
+tier_boundaries: [0.25, 0.5, 0.75]

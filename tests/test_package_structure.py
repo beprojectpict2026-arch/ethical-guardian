@@ -32,6 +32,7 @@ MODULES = [
     "eguard.checks.testing",
     "eguard.reporting",
     "eguard.checks.planning",
+    "eguard.checks.design",
 ]
 
 

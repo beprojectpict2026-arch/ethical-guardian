@@ -22,6 +22,34 @@ problem (a postcode proxy for region), the evaluation confirming it in the train
 the suggested fix removing it. Options: `--quick`, `--bias 0.5`, and `--llm` (requires
 Ollama).
 
+## Command line
+
+```bash
+eguard check planning   --manifest agent.yaml
+eguard check data       --manifest agent.yaml --data history.csv --target hired
+eguard check design     --manifest agent.yaml --prompt-file prompt.txt
+eguard check deployment --manifest agent.yaml --reports reports/*.json
+eguard show reports/planning.json
+```
+
+Each check prints a summary, saves JSON and HTML reports to `reports/` (`--out` to
+change), and exits with **0** (passed), **1** (blocked) or **2** (invalid input). Use
+`--config policy.yaml` to apply your own thresholds and weights, and `--fail-on warn`
+to block on warnings too. The testing phase runs the agent itself, from Python with
+`eguard.evaluate()`; its saved JSON report can be passed to the deployment gate.
+
+### In CI
+
+Because a blocked check exits with code 1, it stops a CI pipeline. For example, in a
+GitHub Actions job:
+
+```yaml
+- name: Ethical Guardian deployment gate
+  run: >
+    eguard check deployment --manifest agent.yaml
+    --reports reports/planning.json reports/design.json reports/testing.json
+```
+
 ## Developer setup
 
 Requires [uv](https://docs.astral.sh/uv/).

@@ -13,6 +13,9 @@ dependencies = [
     "jinja2>=3.1",
 ]
 
+[project.scripts]
+eguard = "eguard.cli:run"
+
 [dependency-groups]
 dev = [
     "pytest>=8.0",

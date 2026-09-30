@@ -35,6 +35,7 @@ MODULES = [
     "eguard.checks.design",
     "eguard.scoring",
     "eguard.checks.deployment",
+    "eguard.cli",
 ]
 
 

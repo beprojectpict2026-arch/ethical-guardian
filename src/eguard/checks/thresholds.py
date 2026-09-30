@@ -1,15 +1,45 @@
-"""Default thresholds for built-in checks. Provisional: see docs/metric_definitions.md."""
+"""Threshold lookup for checks, honouring the configuration of the current check call.
 
-from eguard.results import Threshold
+Checks call ``get_threshold(name)``. Public check functions are decorated with
+``@with_config``, which makes that call's ``config`` argument active while it runs, so
+overrides reach every check without passing the configuration through each helper.
+"""
 
-DEFAULT_THRESHOLDS: dict[str, Threshold] = {
-    "representation": Threshold(warn_at=0.5, fail_at=0.25, direction="lower_is_worse"),
-    "label_parity": Threshold(warn_at=0.9, fail_at=0.8, direction="lower_is_worse"),
-    "proxy": Threshold(warn_at=0.3, fail_at=0.9, direction="higher_is_worse"),
-    "demographic_parity": Threshold(warn_at=0.9, fail_at=0.8, direction="lower_is_worse"),
-    "equalized_odds": Threshold(warn_at=0.05, fail_at=0.1, direction="higher_is_worse"),
-    "counterfactual_flip": Threshold(warn_at=0.01, fail_at=0.05, direction="higher_is_worse"),
-    "job_displacement": Threshold(warn_at=20, fail_at=50, direction="higher_is_worse"),
-    "documentation": Threshold(warn_at=1.0, fail_at=0.5, direction="lower_is_worse"),
-    "design": Threshold(warn_at=0.0, fail_at=0.5, direction="higher_is_worse"),
-}
+from __future__ import annotations
+
+import functools
+from collections.abc import Callable
+from contextvars import ContextVar
+from typing import ParamSpec, TypeVar
+
+from eguard.config import DEFAULT_THRESHOLDS, GuardConfig
+from eguard.scoring import Threshold
+
+__all__ = ["DEFAULT_THRESHOLDS", "get_threshold", "with_config"]
+
+_ACTIVE: ContextVar[GuardConfig | None] = ContextVar("eguard_active_config", default=None)
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+
+def get_threshold(name: str) -> Threshold:
+    """The threshold for `name` under the active configuration (defaults if none)."""
+    config = _ACTIVE.get()
+    if config is None:
+        return DEFAULT_THRESHOLDS[name]
+    return config.threshold(name)
+
+
+def with_config(func: Callable[P, R]) -> Callable[P, R]:
+    """Make the call's `config` keyword argument active while the function runs."""
+
+    @functools.wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        token = _ACTIVE.set(kwargs.get("config"))  # type: ignore[arg-type]
+        try:
+            return func(*args, **kwargs)
+        finally:
+            _ACTIVE.reset(token)
+
+    return wrapper

@@ -18,7 +18,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from eguard.checks.thresholds import DEFAULT_THRESHOLDS
+from eguard.checks.thresholds import get_threshold, with_config
 from eguard.config import GuardConfig
 from eguard.manifest import AgentProfile, Dimension
 from eguard.results import CheckResult, Phase, Report
@@ -206,6 +206,7 @@ MARKET_RULES = (
 )
 
 
+@with_config
 def check_design(
     profile: AgentProfile,
     *,
@@ -368,7 +369,7 @@ def _result(
         dimension,
         PHASE,
         severity,
-        DEFAULT_THRESHOLDS["design"],
+        get_threshold("design"),
         risk=severity,
         message=message,
         evidence={"findings": findings, "safeguards": safeguards},

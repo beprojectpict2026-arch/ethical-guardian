@@ -24,7 +24,7 @@ import pandas as pd
 
 from eguard.agents import agent_name, as_screening_agent, screen
 from eguard.checks.data import _slug
-from eguard.checks.thresholds import DEFAULT_THRESHOLDS
+from eguard.checks.thresholds import get_threshold, with_config
 from eguard.config import GuardConfig
 from eguard.exceptions import EguardWarning
 from eguard.manifest import AgentProfile, AgentType, Dimension
@@ -51,6 +51,7 @@ SCENARIOS = {AgentType.HIRING: "hiring"}
 ATTRIBUTION_MARGIN = 0.1
 
 
+@with_config
 def evaluate(
     agent: Any,
     profile: AgentProfile,
@@ -177,9 +178,9 @@ def _attribute_results(attribute: str, frames: pd.DataFrame, phase: Phase) -> li
     low, high = rates.idxmin(), rates.idxmax()
     per_seed = _per_seed(frames, attribute)
 
-    flip_threshold = DEFAULT_THRESHOLDS["counterfactual_flip"]
+    flip_threshold = get_threshold("counterfactual_flip")
     uses_directly = flip_threshold.evaluate(flip) is not Status.PASS
-    parity_threshold = DEFAULT_THRESHOLDS["demographic_parity"]
+    parity_threshold = get_threshold("demographic_parity")
 
     parity_message = (
         f"Shortlisted {attribute}={low} at {dpr:.0%} of the rate for {high} ({scope}); "
@@ -213,7 +214,7 @@ def _attribute_results(attribute: str, frames: pd.DataFrame, phase: Phase) -> li
         Dimension.EQUITY,
         phase,
         eod,
-        DEFAULT_THRESHOLDS["equalized_odds"],
+        get_threshold("equalized_odds"),
         risk=eod,
         message=(
             f"Largest gap between {attribute} groups in shortlisting qualified or unqualified "

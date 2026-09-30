@@ -17,7 +17,7 @@ from typing import Any
 
 import pandas as pd
 
-from eguard.checks.thresholds import DEFAULT_THRESHOLDS
+from eguard.checks.thresholds import get_threshold, with_config
 from eguard.config import GuardConfig
 from eguard.manifest import AgentProfile, Dimension
 from eguard.metrics import demographic_parity_ratio, proxy_strength
@@ -26,6 +26,7 @@ from eguard.results import CheckResult, Phase, Report, Status
 PHASE = Phase.DATA
 
 
+@with_config
 def check_data(
     profile: AgentProfile,
     data: pd.DataFrame,
@@ -79,7 +80,7 @@ def _representation(attribute: str, groups: pd.Series) -> CheckResult:
         Dimension.EQUITY,
         PHASE,
         ratio,
-        DEFAULT_THRESHOLDS["representation"],
+        get_threshold("representation"),
         risk=None,
         message=(
             f"Smallest {attribute} group ({smallest}) is {ratio:.0%} the size of the largest "
@@ -112,7 +113,7 @@ def _label_parity(attribute: str, groups: pd.Series, labels: pd.Series, target: 
         Dimension.EQUITY,
         PHASE,
         ratio,
-        DEFAULT_THRESHOLDS["label_parity"],
+        get_threshold("label_parity"),
         risk=None if math.isnan(ratio) else 1.0 - ratio,
         message=message,
         evidence={"positive_rates": {str(g): float(r) for g, r in rates.items()}},
@@ -144,7 +145,7 @@ def _proxy(
     scores = {col: proxy_strength(data[col], groups) for col in columns}
     ranked = dict(sorted(scores.items(), key=lambda item: item[1], reverse=True))
     top, strength = next(iter(ranked.items()))
-    threshold = DEFAULT_THRESHOLDS["proxy"]
+    threshold = get_threshold("proxy")
     if threshold.evaluate(strength) is Status.PASS:
         message = (
             f"No column strongly predicts {attribute}; the strongest is '{top}' "

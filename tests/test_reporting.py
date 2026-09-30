@@ -75,7 +75,7 @@ def test_remediation_and_evidence_are_shown(report):
 
 
 def test_unmeasured_dimensions_are_labelled(report):
-    assert "not evaluated in this phase" in render_html(report)
+    assert "not scored in this phase" in render_html(report)
 
 
 def test_passing_empty_report(profile):

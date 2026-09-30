@@ -1,5 +1,6 @@
 """Tests for the deployment gate (eguard.checks.deployment)."""
 
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
@@ -153,6 +154,10 @@ def test_latest_report_per_phase_is_used(profile, design, testing):
     old = check(profile, "planning")
     strict = GuardConfig(thresholds={"job_displacement": {"warn_at": 10, "fail_at": 30}})
     new = check(profile, "planning", config=strict)
+    # Give the new report a clearly later timestamp: Windows' clock can return
+    # identical times for reports created milliseconds apart.
+    later = old.metadata.created_at + timedelta(seconds=1)
+    new = new.model_copy(update={"metadata": new.metadata.model_copy(update={"created_at": later})})
     report = gate(profile, [new, old, design, testing])
     assert result_of(report, "labour.job_displacement").status is Status.FAIL
     assert len(report.metadata.notes["superseded"]) == 1

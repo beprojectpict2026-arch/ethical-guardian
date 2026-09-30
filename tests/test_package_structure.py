@@ -31,6 +31,7 @@ MODULES = [
     "eguard.scenarios.hiring.reference",
     "eguard.checks.testing",
     "eguard.reporting",
+    "eguard.checks.planning",
 ]
 
 

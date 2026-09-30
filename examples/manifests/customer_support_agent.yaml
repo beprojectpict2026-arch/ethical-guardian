@@ -18,22 +18,26 @@ affected_groups:
 protected_attributes:
   - language
 
+# reskilling_feasibility values are illustrative; to be derived from O*NET skill similarity.
 automated_tasks:
   - description: Answer routine order and delivery queries
     occupation: Customer Service Representatives
     onet_code: "43-4051.00"
     automation_fraction: 0.9
     weight: 5
+    reskilling_feasibility: 0.4
   - description: Process refund requests
     occupation: Customer Service Representatives
     onet_code: "43-4051.00"
     automation_fraction: 0.6
     weight: 2
+    reskilling_feasibility: 0.4
   - description: Handle complaints and disputes
     occupation: Customer Service Representatives
     onet_code: "43-4051.00"
     automation_fraction: 0.2
     weight: 2
+    reskilling_feasibility: 0.4
 
 ai_model:
   provider: ollama

@@ -216,8 +216,8 @@ def test_check_requires_data_and_target(profile, small_data):
 
 
 def test_unimplemented_phase(profile):
-    with pytest.raises(NotImplementedError, match="planning"):
-        check(profile, "planning")
+    with pytest.raises(NotImplementedError, match="monitoring"):
+        check(profile, "monitoring")
 
 
 def test_unknown_phase(profile):

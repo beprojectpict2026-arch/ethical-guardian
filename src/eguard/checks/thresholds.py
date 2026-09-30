@@ -11,4 +11,5 @@ DEFAULT_THRESHOLDS: dict[str, Threshold] = {
     "counterfactual_flip": Threshold(warn_at=0.01, fail_at=0.05, direction="higher_is_worse"),
     "job_displacement": Threshold(warn_at=20, fail_at=50, direction="higher_is_worse"),
     "documentation": Threshold(warn_at=1.0, fail_at=0.5, direction="lower_is_worse"),
+    "design": Threshold(warn_at=0.0, fail_at=0.5, direction="higher_is_worse"),
 }

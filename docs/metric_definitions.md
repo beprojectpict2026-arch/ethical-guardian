@@ -1,6 +1,6 @@
 # Metric Definitions
 
-**Status:** v1.5 (Stage 4). This document is the single source of truth for every metric in
+**Status:** v1.6 (Stage 4). This document is the single source of truth for every metric in
 `eguard.metrics` and every check built on them. Code, tests and the paper must match it. Any
 change to a formula or threshold is made here first, in a reviewed pull request.
 
@@ -503,6 +503,32 @@ are a screen for human review, not a verdict.
 
 ---
 
+## 6c. Deployment gate: evidence and identity
+
+**Dimension:** Transparency. **Module:** `eguard.checks.deployment` (deployment phase)
+
+**Purpose.** The gate combines earlier lifecycle reports into one release decision. It
+carries forward every result from the latest report of each earlier phase (for evaluation
+phases, only the most advanced: testing over training over development), so its composite
+score covers the whole lifecycle, and adds two checks.
+
+**Evidence completeness.** The share of required phases (default: planning, design and
+testing) that have a report.
+
+**Identity consistency.** The share of input reports produced for the agent name and version
+being released.
+
+**Thresholds (provisional).** For both: warn and fail below 1.0, so any missing or mismatched
+evidence fails the gate.
+
+**Risk.** None (diagnostic); the carried results provide the risk.
+
+**Waivers.** A failing carried result may be waived with a written justification. It then
+counts as a warning, keeps its risk in the composite score, and the justification is recorded
+in the report. Only failing checks can be waived.
+
+---
+
 ## 7. Composite ethical–economic risk score
 
 **Module:** `eguard.results.Report` and `eguard.config.GuardConfig`.
@@ -534,7 +560,7 @@ Each metric is converted to a risk value $r \in [0, 1]$:
 | CV | $\min\big(\max(\text{CV}_{\text{agent}} - \text{CV}_{\text{baseline}}, 0) / \text{CV}_{\text{ref}},\, 1\big)$, with $\text{CV}_{\text{ref}} = 20$ percentage points (provisional) |
 | Proxy strength (data phase) | $\text{proxy strength} \times (1 - \text{DPR of the label})$ |
 | Design instruction scan | highest severity among findings (1.0 / 0.5 / 0.25) |
-| Representation ratio, counterfactual flip rate, documentation completeness | none (diagnostic only) |
+| Representation ratio, counterfactual flip rate, documentation completeness, gate evidence and identity | none (diagnostic only) |
 
 A dimension's risk $r_d$ is the **maximum** of its available metric risks. A risk tool
 should not let one good metric hide a bad one.
@@ -598,3 +624,4 @@ dimensions: equity and labour.
 | v1.3 | Planning-phase use of JDS (per occupation, conservative reskilling assumption, thresholds) and documentation completeness (6a). |
 | v1.4 | Design instruction scan (6b). |
 | v1.5 | All thresholds, weights and tier boundaries configurable via `GuardConfig`. |
+| v1.6 | Deployment gate: evidence completeness, identity consistency and waivers (6c). |

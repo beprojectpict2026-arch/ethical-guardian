@@ -39,6 +39,8 @@ DEFAULT_THRESHOLDS: dict[str, Threshold] = {
     "documentation": Threshold(warn_at=1.0, fail_at=0.5, direction="lower_is_worse"),
     # design phase
     "design": Threshold(warn_at=0.0, fail_at=0.5, direction="higher_is_worse"),
+    # deployment gate
+    "gate_evidence": Threshold(warn_at=1.0, fail_at=1.0, direction="lower_is_worse"),
 }
 
 
